@@ -62,7 +62,10 @@ extern crate brotli;
 extern crate chrono;
 #[cfg(feature = "gzip")]
 extern crate deflate;
+
+#[cfg(not(target_env = "sgx"))]
 extern crate filetime;
+
 extern crate multipart;
 extern crate rand;
 extern crate serde;
@@ -89,7 +92,9 @@ pub const DEFAULT_ENCODE_SET: &percent_encoding::AsciiSet = &percent_encoding::C
     .add(b'{')
     .add(b'}');
 
+#[cfg(not(target_env="sgx"))]
 pub use assets::extension_to_mime;
+#[cfg(not(target_env="sgx"))]
 pub use assets::match_assets;
 pub use log::{log, log_custom};
 pub use response::{Response, ResponseBody};
@@ -120,7 +125,9 @@ pub mod proxy;
 pub mod session;
 pub mod websocket;
 
+#[cfg(not(target_env= "sgx"))]
 mod assets;
+
 mod find_route;
 mod log;
 mod response;

@@ -23,14 +23,14 @@ fn main() {
     // from another machine than your own.
     println!("Now listening on localhost:8000");
 
-    rouille::start_server("localhost:8000", move |request| {
+    rouille::start_server("0.0.0.0:8000", move |request| {
         router!(request,
             (GET) (/) => {
                 // The / route outputs an HTML client so that the user can try the websockets.
                 // Note that in a real website you should probably use some templating system, or
                 // at least load the HTML from a file.
                 Response::html("<script type=\"text/javascript\">
-                    var socket = new WebSocket(\"ws://localhost:8000/ws\", \"echo\");
+                    var socket = new WebSocket(\"ws://Euler.local:8000/ws\", \"echo\");
                     function send(data) {{
                         socket.send(data);
                     }}
