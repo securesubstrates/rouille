@@ -11,9 +11,9 @@ keywords = ["web", "framework", "http", "rest"]
 categories = ["web-programming::http-server", "web-programming::websocket"]
 
 [features]
-default = ["gzip", "brotli"]
+default = ["gzip", "brotli", "ssl"]
 gzip = ["deflate"]
-ssl = ["tiny_http/ssl"]
+ssl = ["tiny_http/ssl-mbedtls"]
 rustls = ["tiny_http/ssl-rustls"]
 
 [dependencies]

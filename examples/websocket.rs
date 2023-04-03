@@ -14,6 +14,7 @@ use std::thread;
 
 use rouille::websocket;
 use rouille::Response;
+use rouille::Server;
 
 fn main() {
     // This example demonstrates how to use websockets with rouille.
@@ -22,15 +23,20 @@ fn main() {
     // Note that like all examples we only listen on `localhost`, so you can't access this server
     // from another machine than your own.
     println!("Now listening on localhost:8000");
+    let mut pk = include_bytes!("../../tiny-http/examples/ssl-cert.pem").to_vec();
+    let mut sk = include_bytes!("../../tiny-http/examples/ssl-key.pem").to_vec();
+    pk.push(0);
+    sk.push(0);
 
-    rouille::start_server("0.0.0.0:8000", move |request| {
+    let mut ssl = Server::new_ssl("0.0.0.0:8000", move |request| {
         router!(request,
             (GET) (/) => {
                 // The / route outputs an HTML client so that the user can try the websockets.
                 // Note that in a real website you should probably use some templating system, or
                 // at least load the HTML from a file.
+                eprintln!("Received request on /");
                 Response::html("<script type=\"text/javascript\">
-                    var socket = new WebSocket(\"ws://Euler.local:8000/ws\", \"echo\");
+                    var socket = new WebSocket(\"wss://10.0.0.157:8000/ws\", \"echo\");
                     function send(data) {{
                         socket.send(data);
                     }}
@@ -47,7 +53,8 @@ fn main() {
                     <p id=\"result\"></p>")
             },
 
-            (GET) (/ws) => {
+                (GET) (/ws) => {
+                    eprintln!("Received request on /ws");
                 // This is the websockets route.
 
                 // In order to start using websockets we call `websocket::start`.
@@ -75,7 +82,9 @@ fn main() {
             // Default 404 route as with all examples.
             _ => rouille::Response::empty_404()
         )
-    });
+    }, pk, sk).expect("Failed to create sever");
+
+    ssl.run();
 }
 
 // Function run in a separate thread.
