@@ -1,0 +1,360 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in library 'rouille'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--lib",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "rouille",
+          "kind": "lib"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'database'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=database",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "database",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'database'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=database",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "database",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'static-files'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=static-files",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "static-files",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'static-files'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=static-files",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "static-files",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'php'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=php",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "php",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'php'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=php",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "php",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'git-http-backend'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=git-http-backend",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "git-http-backend",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'git-http-backend'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=git-http-backend",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "git-http-backend",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'reverse-proxy'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=reverse-proxy",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "reverse-proxy",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'reverse-proxy'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=reverse-proxy",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "reverse-proxy",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'hello-world'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=hello-world",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "hello-world",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'hello-world'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=hello-world",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "hello-world",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'login-session'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=login-session",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "login-session",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'login-session'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=login-session",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "login-session",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'websocket'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=websocket",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "websocket",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'websocket'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=websocket",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "websocket",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug example 'simple-form'",
+      "cargo": {
+        "args": [
+          "build",
+          "--example=simple-form",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "simple-form",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug unit tests in example 'simple-form'",
+      "cargo": {
+        "args": [
+          "test",
+          "--no-run",
+          "--example=simple-form",
+          "--package=rouille"
+        ],
+        "filter": {
+          "name": "simple-form",
+          "kind": "example"
+        }
+      },
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}
