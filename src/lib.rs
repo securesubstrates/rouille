@@ -71,10 +71,9 @@ extern crate rand;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
-extern crate num_cpus;
 pub extern crate percent_encoding;
 extern crate serde_json;
-extern crate sha1;
+extern crate sha1_smol;
 extern crate threadpool;
 extern crate time;
 extern crate tiny_http;
@@ -251,9 +250,15 @@ where
     A: ToSocketAddrs,
     F: Send + Sync + 'static + Fn(&Request) -> Response,
 {
+    let pool_size = pool_size.unwrap_or_else(|| {
+        8 * thread::available_parallelism()
+            .map(|n| n.get())
+            .unwrap_or(1)
+    });
+
     Server::new(addr, handler)
         .expect("Failed to start server")
-        .pool_size(pool_size.unwrap_or_else(|| 8 * num_cpus::get()))
+        .pool_size(pool_size)
         .run();
     panic!("The server socket closed unexpectedly")
 }
@@ -377,7 +382,7 @@ where
     ///
     /// Returns an error if there was an error while creating the listening socket, for example if
     /// the port is already in use.
-    #[cfg(feature = "ssl")]
+    #[cfg(any(feature = "ssl", feature = "rustls"))]
     pub fn new_ssl<A>(
         addr: A,
         handler: F,

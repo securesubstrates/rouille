@@ -1,6 +1,6 @@
 [package]
 name = "rouille"
-version = "3.6.1"
+version = "3.6.2"
 authors = ["Pierre Krieger <pierre.krieger1708@gmail.com>"]
 license = "MIT/Apache-2.0"
 repository = "https://github.com/tomaka/rouille"
@@ -27,12 +27,11 @@ rand = "0.8"
 serde = "1"
 serde_derive = "1"
 serde_json = "1"
-sha1 = "0.10.1"
 time = { version = "0.3.15", features = [ "local-offset" ] }
 tiny_http = { path = "../tiny-http", default-features = false }
 url = "2"
 threadpool = "1"
-num_cpus = "1"
+sha1_smol = "1.0.0"
 
 [target.'cfg(not(target_env="sgx"))'.dependencies]
 filetime = "0.2.0"
