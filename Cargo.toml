@@ -18,8 +18,8 @@ rustls = ["tiny_http/ssl-rustls"]
 
 [dependencies]
 base64 = "0.13"
-brotli = { version = "3.3.2", optional = true }
-chrono = { version = "0.4.19", default-features = false, features = ["clock"] }
+brotli = { version = "3.4.0", optional = true }
+chrono = { version = "0.4.31", default-features = false, features = ["clock"] }
 deflate = { version = "1.0.0", optional = true, features = ["gzip"] }
 multipart = { version = "0.18", default-features = false, features = ["server"] }
 percent-encoding = "2"
@@ -27,7 +27,7 @@ rand = "0.8"
 serde = "1"
 serde_derive = "1"
 serde_json = "1"
-time = { version = "0.3.15", features = [ "local-offset" ] }
+time = { version = "0.3.29", features = [ "local-offset" ] }
 tiny_http = { path = "../tiny-http", default-features = false }
 url = "2"
 threadpool = "1"

@@ -112,7 +112,8 @@ impl fmt::Display for WebsocketError {
                 "the request does not match a websocket request"
             }
             WebsocketError::WrongSubprotocol => {
-                "the subprotocol passed to the function was not requested by the client"
+                "the subprotocol passed to the function was not \
+                 requested by the client"
             }
         };
 
@@ -165,7 +166,9 @@ where
     let key = {
         let in_key = match request.header("Sec-WebSocket-Key") {
             Some(h) => h,
-            None => return Err(WebsocketError::InvalidWebsocketRequest),
+            None => {
+                return Err(WebsocketError::InvalidWebsocketRequest);
+            }
         };
 
         convert_key(in_key)
@@ -201,7 +204,9 @@ where
 /// }
 /// ```
 // TODO: return references to the request
-pub fn requested_protocols(request: &Request) -> RequestedProtocolsIter {
+pub fn requested_protocols(
+    request: &Request,
+) -> RequestedProtocolsIter {
     match request.header("Sec-WebSocket-Protocol") {
         None => RequestedProtocolsIter {
             iter: Vec::new().into_iter(),
