@@ -17,7 +17,7 @@
 //! - In order to read a plain text body, see
 //!   [the `plain_text_body` function](fn.plain_text_body.html).
 
-use base64;
+use base64::{engine::general_purpose as b64, Engine as _};
 use Request;
 
 /// Credentials returned by `basic_http_auth`.
@@ -57,7 +57,9 @@ pub struct HttpAuthCredentials {
 ///     Response::text("You are in a secret area")
 /// }
 /// ```
-pub fn basic_http_auth(request: &Request) -> Option<HttpAuthCredentials> {
+pub fn basic_http_auth(
+    request: &Request,
+) -> Option<HttpAuthCredentials> {
     let header = match request.header("Authorization") {
         None => return None,
         Some(h) => h,
@@ -73,7 +75,10 @@ pub fn basic_http_auth(request: &Request) -> Option<HttpAuthCredentials> {
         return None;
     }
 
-    let authvalue = match split.next().and_then(|val| base64::decode(val).ok()) {
+    let authvalue = match split
+        .next()
+        .and_then(|val| b64::STANDARD.decode(val).ok())
+    {
         Some(v) => v,
         None => return None,
     };
@@ -108,7 +113,8 @@ mod test {
 
     #[test]
     fn basic_http_auth_no_header() {
-        let request = Request::fake_http("GET", "/", vec![], Vec::new());
+        let request =
+            Request::fake_http("GET", "/", vec![], Vec::new());
         assert_eq!(basic_http_auth(&request), None);
     }
 
@@ -117,7 +123,10 @@ mod test {
         let request = Request::fake_http(
             "GET",
             "/",
-            vec![("Authorization".to_owned(), "hello world".to_owned())],
+            vec![(
+                "Authorization".to_owned(),
+                "hello world".to_owned(),
+            )],
             Vec::new(),
         );
         assert_eq!(basic_http_auth(&request), None);
