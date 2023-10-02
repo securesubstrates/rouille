@@ -58,10 +58,10 @@
 
 extern crate base64;
 #[cfg(feature = "brotli")]
-extern crate brotli;
+pub extern crate brotli;
 extern crate chrono;
 #[cfg(feature = "gzip")]
-extern crate deflate;
+pub extern crate deflate;
 
 #[cfg(not(target_env = "sgx"))]
 extern crate filetime;
@@ -80,20 +80,21 @@ extern crate tiny_http;
 pub extern crate url;
 
 // https://github.com/servo/rust-url/blob/e121d8d0aafd50247de5f5310a227ecb1efe6ffe/percent_encoding/lib.rs#L126
-pub const DEFAULT_ENCODE_SET: &percent_encoding::AsciiSet = &percent_encoding::CONTROLS
-    .add(b' ')
-    .add(b'"')
-    .add(b'#')
-    .add(b'<')
-    .add(b'>')
-    .add(b'`')
-    .add(b'?')
-    .add(b'{')
-    .add(b'}');
+pub const DEFAULT_ENCODE_SET: &percent_encoding::AsciiSet =
+    &percent_encoding::CONTROLS
+        .add(b' ')
+        .add(b'"')
+        .add(b'#')
+        .add(b'<')
+        .add(b'>')
+        .add(b'`')
+        .add(b'?')
+        .add(b'{')
+        .add(b'}');
 
-#[cfg(not(target_env="sgx"))]
+#[cfg(not(target_env = "sgx"))]
 pub use assets::extension_to_mime;
-#[cfg(not(target_env="sgx"))]
+#[cfg(not(target_env = "sgx"))]
 pub use assets::match_assets;
 pub use log::{log, log_custom};
 pub use response::{Response, ResponseBody};
@@ -124,7 +125,7 @@ pub mod proxy;
 pub mod session;
 pub mod websocket;
 
-#[cfg(not(target_env= "sgx"))]
+#[cfg(not(target_env = "sgx"))]
 mod assets;
 
 mod find_route;
@@ -245,7 +246,11 @@ where
 ///
 /// When `pool_size` is `None`, the thread pool size will default to `8 * num-cpus`.
 /// `pool_size` must be greater than zero or this function will panic.
-pub fn start_server_with_pool<A, F>(addr: A, pool_size: Option<usize>, handler: F) -> !
+pub fn start_server_with_pool<A, F>(
+    addr: A,
+    pool_size: Option<usize>,
+    handler: F,
+) -> !
 where
     A: ToSocketAddrs,
     F: Send + Sync + 'static + Fn(&Request) -> Response,
@@ -364,7 +369,10 @@ where
     ///
     /// Returns an error if there was an error while creating the listening socket, for example if
     /// the port is already in use.
-    pub fn new<A>(addr: A, handler: F) -> Result<Server<F>, Box<dyn Error + Send + Sync + 'static>>
+    pub fn new<A>(
+        addr: A,
+        handler: F,
+    ) -> Result<Server<F>, Box<dyn Error + Send + Sync + 'static>>
     where
         A: ToSocketAddrs,
     {
@@ -471,12 +479,16 @@ where
     /// handle.join().unwrap();
     /// ```
     #[inline]
-    pub fn stoppable(self) -> (thread::JoinHandle<()>, mpsc::Sender<()>) {
+    pub fn stoppable(
+        self,
+    ) -> (thread::JoinHandle<()>, mpsc::Sender<()>) {
         let (tx, rx) = mpsc::channel();
         let handle = thread::spawn(move || {
             while rx.try_recv().is_err() {
                 // In order to reduce CPU load wait 1s for a recv before looping again
-                while let Ok(Some(request)) = self.server.recv_timeout(Duration::from_secs(1)) {
+                while let Ok(Some(request)) =
+                    self.server.recv_timeout(Duration::from_secs(1))
+                {
                     self.process(request);
                 }
             }
@@ -581,14 +593,17 @@ where
                 let headers = request
                     .headers()
                     .iter()
-                    .map(|h| (h.field.to_string(), h.value.clone().into()))
+                    .map(|h| {
+                        (h.field.to_string(), h.value.clone().into())
+                    })
                     .collect();
                 let remote_addr = request.remote_addr().copied();
 
                 tiny_http_request = Arc::new(Mutex::new(Some(request)));
-                let data = Arc::new(Mutex::new(Some(
-                    Box::new(RequestRead(tiny_http_request.clone())) as Box<_>,
-                )));
+                let data = Arc::new(Mutex::new(Some(Box::new(
+                    RequestRead(tiny_http_request.clone()),
+                )
+                    as Box<_>)));
 
                 Request {
                     url,
@@ -614,17 +629,20 @@ where
                 match res {
                     Ok(r) => r,
                     Err(_) => Response::html(
-                        "<h1>Internal Server Error</h1>\
-                                        <p>An internal error has occurred on the server.</p>",
+                        "<h1>Internal Server Error</h1><p>An internal \
+                         error has occurred on the server.</p>",
                     )
                     .with_status_code(500),
                 }
             };
 
             // writing the response
-            let (res_data, res_len) = rouille_response.data.into_reader_and_size();
-            let mut response = tiny_http::Response::empty(rouille_response.status_code)
-                .with_data(res_data, res_len);
+            let (res_data, res_len) =
+                rouille_response.data.into_reader_and_size();
+            let mut response = tiny_http::Response::empty(
+                rouille_response.status_code,
+            )
+            .with_data(res_data, res_len);
 
             let mut upgrade_header = "".into();
 
@@ -638,8 +656,10 @@ where
                     continue;
                 }
 
-                if let Ok(header) = tiny_http::Header::from_bytes(key.as_bytes(), value.as_bytes())
-                {
+                if let Ok(header) = tiny_http::Header::from_bytes(
+                    key.as_bytes(),
+                    value.as_bytes(),
+                ) {
                     response.add_header(header);
                 } else {
                     // TODO: ?
@@ -647,7 +667,8 @@ where
             }
 
             if let Some(ref mut upgrade) = rouille_response.upgrade {
-                let trq = tiny_http_request.lock().unwrap().take().unwrap();
+                let trq =
+                    tiny_http_request.lock().unwrap().take().unwrap();
                 let socket = trq.upgrade(&upgrade_header, response);
                 upgrade.build(socket);
             } else {
@@ -712,7 +733,9 @@ impl Request {
         U: Into<String>,
         M: Into<String>,
     {
-        let data = Arc::new(Mutex::new(Some(Box::new(Cursor::new(data)) as Box<_>)));
+        let data = Arc::new(Mutex::new(Some(
+            Box::new(Cursor::new(data)) as Box<_>,
+        )));
         let remote_addr = Some("127.0.0.1:12345".parse().unwrap());
 
         Request {
@@ -737,7 +760,9 @@ impl Request {
         U: Into<String>,
         M: Into<String>,
     {
-        let data = Arc::new(Mutex::new(Some(Box::new(Cursor::new(data)) as Box<_>)));
+        let data = Arc::new(Mutex::new(Some(
+            Box::new(Cursor::new(data)) as Box<_>,
+        )));
 
         Request {
             url: url.into(),
@@ -763,7 +788,9 @@ impl Request {
         U: Into<String>,
         M: Into<String>,
     {
-        let data = Arc::new(Mutex::new(Some(Box::new(Cursor::new(data)) as Box<_>)));
+        let data = Arc::new(Mutex::new(Some(
+            Box::new(Cursor::new(data)) as Box<_>,
+        )));
         let remote_addr = Some("127.0.0.1:12345".parse().unwrap());
 
         Request {
@@ -788,7 +815,9 @@ impl Request {
         U: Into<String>,
         M: Into<String>,
     {
-        let data = Arc::new(Mutex::new(Some(Box::new(Cursor::new(data)) as Box<_>)));
+        let data = Arc::new(Mutex::new(Some(
+            Box::new(Cursor::new(data)) as Box<_>,
+        )));
 
         Request {
             url: url.into(),
@@ -913,7 +942,8 @@ impl Request {
     /// ```
     pub fn url(&self) -> String {
         let url = self.url.as_bytes();
-        let url = if let Some(pos) = url.iter().position(|&c| c == b'?') {
+        let url = if let Some(pos) = url.iter().position(|&c| c == b'?')
+        {
             &url[..pos]
         } else {
             url
@@ -929,13 +959,17 @@ impl Request {
         let name_pattern = &format!("{}=", param_name);
         let param_pairs = self.raw_query_string().split('&');
         param_pairs
-            .filter(|pair| pair.starts_with(name_pattern) || pair == &param_name)
+            .filter(|pair| {
+                pair.starts_with(name_pattern) || pair == &param_name
+            })
             .map(|pair| pair.split('=').nth(1).unwrap_or(""))
             .next()
             .map(|value| {
-                percent_encoding::percent_decode(value.replace('+', " ").as_bytes())
-                    .decode_utf8_lossy()
-                    .into_owned()
+                percent_encoding::percent_decode(
+                    value.replace('+', " ").as_bytes(),
+                )
+                .decode_utf8_lossy()
+                .into_owned()
             })
     }
 
@@ -1095,108 +1129,160 @@ mod tests {
 
     #[test]
     fn get_param() {
-        let request = Request::fake_http("GET", "/?p=hello", vec![], vec![]);
+        let request =
+            Request::fake_http("GET", "/?p=hello", vec![], vec![]);
         assert_eq!(request.get_param("p"), Some("hello".to_owned()));
     }
 
     #[test]
     fn get_param_multiple_param() {
-        let request = Request::fake_http("GET", "/?foo=bar&message=hello", vec![], vec![]);
-        assert_eq!(request.get_param("message"), Some("hello".to_owned()));
+        let request = Request::fake_http(
+            "GET",
+            "/?foo=bar&message=hello",
+            vec![],
+            vec![],
+        );
+        assert_eq!(
+            request.get_param("message"),
+            Some("hello".to_owned())
+        );
     }
     #[test]
     fn get_param_no_match() {
-        let request = Request::fake_http("GET", "/?hello=world", vec![], vec![]);
+        let request =
+            Request::fake_http("GET", "/?hello=world", vec![], vec![]);
         assert_eq!(request.get_param("foo"), None);
     }
 
     #[test]
     fn get_param_partial_suffix_match() {
-        let request = Request::fake_http("GET", "/?hello=world", vec![], vec![]);
+        let request =
+            Request::fake_http("GET", "/?hello=world", vec![], vec![]);
         assert_eq!(request.get_param("lo"), None);
     }
 
     #[test]
     fn get_param_partial_prefix_match() {
-        let request = Request::fake_http("GET", "/?hello=world", vec![], vec![]);
+        let request =
+            Request::fake_http("GET", "/?hello=world", vec![], vec![]);
         assert_eq!(request.get_param("he"), None);
     }
 
     #[test]
     fn get_param_superstring_match() {
-        let request = Request::fake_http("GET", "/?jan=01", vec![], vec![]);
+        let request =
+            Request::fake_http("GET", "/?jan=01", vec![], vec![]);
         assert_eq!(request.get_param("january"), None);
     }
 
     #[test]
     fn get_param_flag_with_equals() {
-        let request = Request::fake_http("GET", "/?flag=", vec![], vec![]);
+        let request =
+            Request::fake_http("GET", "/?flag=", vec![], vec![]);
         assert_eq!(request.get_param("flag"), Some("".to_owned()));
     }
 
     #[test]
     fn get_param_flag_without_equals() {
-        let request = Request::fake_http("GET", "/?flag", vec![], vec![]);
+        let request =
+            Request::fake_http("GET", "/?flag", vec![], vec![]);
         assert_eq!(request.get_param("flag"), Some("".to_owned()));
     }
 
     #[test]
     fn get_param_flag_with_multiple_params() {
-        let request = Request::fake_http("GET", "/?flag&foo=bar", vec![], vec![]);
+        let request =
+            Request::fake_http("GET", "/?flag&foo=bar", vec![], vec![]);
         assert_eq!(request.get_param("flag"), Some("".to_owned()));
     }
 
     #[test]
     fn body_twice() {
-        let request = Request::fake_http("GET", "/", vec![], vec![62, 62, 62]);
+        let request =
+            Request::fake_http("GET", "/", vec![], vec![62, 62, 62]);
         assert!(request.data().is_some());
         assert!(request.data().is_none());
     }
 
     #[test]
     fn url_strips_get_query() {
-        let request = Request::fake_http("GET", "/?p=hello", vec![], vec![]);
+        let request =
+            Request::fake_http("GET", "/?p=hello", vec![], vec![]);
         assert_eq!(request.url(), "/");
     }
 
     #[test]
     fn urlencode_query_string() {
-        let request = Request::fake_http("GET", "/?p=hello%20world", vec![], vec![]);
-        assert_eq!(request.get_param("p"), Some("hello world".to_owned()));
+        let request = Request::fake_http(
+            "GET",
+            "/?p=hello%20world",
+            vec![],
+            vec![],
+        );
+        assert_eq!(
+            request.get_param("p"),
+            Some("hello world".to_owned())
+        );
     }
 
     #[test]
     fn plus_in_query_string() {
-        let request = Request::fake_http("GET", "/?p=hello+world", vec![], vec![]);
-        assert_eq!(request.get_param("p"), Some("hello world".to_owned()));
+        let request = Request::fake_http(
+            "GET",
+            "/?p=hello+world",
+            vec![],
+            vec![],
+        );
+        assert_eq!(
+            request.get_param("p"),
+            Some("hello world".to_owned())
+        );
     }
 
     #[test]
     fn encoded_plus_in_query_string() {
-        let request = Request::fake_http("GET", "/?p=hello%2Bworld", vec![], vec![]);
-        assert_eq!(request.get_param("p"), Some("hello+world".to_owned()));
+        let request = Request::fake_http(
+            "GET",
+            "/?p=hello%2Bworld",
+            vec![],
+            vec![],
+        );
+        assert_eq!(
+            request.get_param("p"),
+            Some("hello+world".to_owned())
+        );
     }
 
     #[test]
     fn url_encode() {
-        let request = Request::fake_http("GET", "/hello%20world", vec![], vec![]);
+        let request =
+            Request::fake_http("GET", "/hello%20world", vec![], vec![]);
         assert_eq!(request.url(), "/hello world");
     }
 
     #[test]
     fn plus_in_url() {
-        let request = Request::fake_http("GET", "/hello+world", vec![], vec![]);
+        let request =
+            Request::fake_http("GET", "/hello+world", vec![], vec![]);
         assert_eq!(request.url(), "/hello+world");
     }
 
     #[test]
     fn dnt() {
-        let request =
-            Request::fake_http("GET", "/", vec![("DNT".to_owned(), "1".to_owned())], vec![]);
+        let request = Request::fake_http(
+            "GET",
+            "/",
+            vec![("DNT".to_owned(), "1".to_owned())],
+            vec![],
+        );
         assert_eq!(request.do_not_track(), Some(true));
 
-        let request =
-            Request::fake_http("GET", "/", vec![("DNT".to_owned(), "0".to_owned())], vec![]);
+        let request = Request::fake_http(
+            "GET",
+            "/",
+            vec![("DNT".to_owned(), "0".to_owned())],
+            vec![],
+        );
         assert_eq!(request.do_not_track(), Some(false));
 
         let request = Request::fake_http("GET", "/", vec![], vec![]);
